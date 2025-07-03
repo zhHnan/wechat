@@ -1,0 +1,13 @@
+server:
+  tomcat:
+    uri-encoding: utf-8
+    max-swallow-size: -1 # -1 unlimited
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: main-service
+logging:
+  level:
+    root: info
