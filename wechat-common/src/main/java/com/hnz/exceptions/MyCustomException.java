@@ -1,7 +1,7 @@
 package com.hnz.exceptions;
 
 
-import com.hnz.grace.result.ResponseStatusEnum;
+import com.hnz.result.ResponseStatusEnum;
 
 /**
  * 自定义异常

@@ -1,7 +1,7 @@
 package com.hnz.exceptions;
 
-import com.hnz.grace.result.GraceJSONResult;
-import com.hnz.grace.result.ResponseStatusEnum;
+import com.hnz.result.R;
+import com.hnz.result.ResponseStatusEnum;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,24 +19,24 @@ public class GraceExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseBody
-    public GraceJSONResult returnMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+    public R returnMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
         e.printStackTrace();
-        return GraceJSONResult.exception(ResponseStatusEnum.FILE_MAX_SIZE_500KB_ERROR);
+        return R.exception(ResponseStatusEnum.FILE_MAX_SIZE_500KB_ERROR);
     }
 
     @ExceptionHandler(MyCustomException.class)
     @ResponseBody
-    public GraceJSONResult returnMyCustomException(MyCustomException e) {
+    public R returnMyCustomException(MyCustomException e) {
         e.printStackTrace();
-        return GraceJSONResult.exception(e.getResponseStatusEnum());
+        return R.exception(e.getResponseStatusEnum());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
-    public GraceJSONResult returnNotValidException(MethodArgumentNotValidException e) {
+    public R returnNotValidException(MethodArgumentNotValidException e) {
         BindingResult result = e.getBindingResult();
         Map<String, String> errors = getErrors(result);
-        return GraceJSONResult.errorMap(errors);
+        return R.errorMap(errors);
     }
 
     public Map<String, String> getErrors(BindingResult result) {

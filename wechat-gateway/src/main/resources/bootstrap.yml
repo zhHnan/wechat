@@ -9,6 +9,27 @@ spring:
       discovery:
         locator:
           enabled: true
-        routes:
-          - id: auth-service
-            uri: lb://auth-service
+      routes:
+        - id: auth-service
+          # 负载均衡
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: file-service
+          # 负载均衡
+          uri: lb://file-service
+          predicates:
+            - Path=/file/**
+        - id: main-service
+          # 负载均衡
+          uri: lb://main-service
+          predicates:
+            - Path=/main/**
+      globalcors:
+        cors-configurations:
+           '[/**]':
+             allowedOriginPatterns: "*"
+             allowedMethods: "*"
+             allowedHeaders: "*"
+             allowCredentials: true

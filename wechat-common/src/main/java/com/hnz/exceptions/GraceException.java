@@ -1,7 +1,7 @@
 package com.hnz.exceptions;
 
 
-import com.hnz.grace.result.ResponseStatusEnum;
+import com.hnz.result.ResponseStatusEnum;
 
 /**
  * 优雅的处理异常，统一进行封装

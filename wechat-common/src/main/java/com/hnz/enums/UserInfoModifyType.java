@@ -2,7 +2,7 @@ package com.hnz.enums;
 
 
 import com.hnz.exceptions.GraceException;
-import com.hnz.grace.result.ResponseStatusEnum;
+import com.hnz.result.ResponseStatusEnum;
 
 /**
  * @Desc: 修改用户信息类型 枚举
