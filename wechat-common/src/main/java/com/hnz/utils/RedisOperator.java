@@ -1,11 +1,11 @@
 package com.hnz.utils;
 
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.StringRedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisOperator {
 	
-	@Resource
-	private RedisTemplate<String, String> redisTemplate;
+	@Resource(name = "stringRedisTemplate")
+	private StringRedisTemplate redisTemplate;
 
 	// Key（键），简单的key-value操作
 
