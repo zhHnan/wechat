@@ -2,6 +2,12 @@ server:
   port: 8090
 
 spring:
+  data:
+    redis:
+      host: 47.83.162.65
+      port: 5379
+      database: 0
+      password: hnzadmin
   cloud:
     nacos:
       discovery:
