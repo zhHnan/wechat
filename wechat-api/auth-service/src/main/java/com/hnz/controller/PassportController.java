@@ -6,9 +6,7 @@ import com.hnz.utils.IPUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author：hnz
@@ -19,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/passport")
 @Slf4j
 public class PassportController extends BaseInfoProperties {
-    @GetMapping("getSmsCode")
+    @PostMapping("getSMSCode")
     public R getSmsCode(String mobile, HttpServletRequest request) {
         if (StringUtils.isBlank(mobile)) {
             return R.errorMsg("手机号不能为空");
@@ -36,4 +34,10 @@ public class PassportController extends BaseInfoProperties {
         log.info("存入redis：{}", redis.get(MOBILE_SMSCODE + ":" + mobile));
         return R.ok();
     }
+
+//    @PostMapping("regist")
+//    public R regist(@RequestBody RegistLoginBo registLoginBo, HttpServletRequest request) {
+//
+//        return R.ok();
+//    }
 }

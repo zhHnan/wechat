@@ -23,7 +23,7 @@ spring:
           # 负载均衡
           uri: lb://auth-service
           predicates:
-            - Path=/auth/**
+            - Path=/passport/**
 
         - id: file-service
           # 负载均衡

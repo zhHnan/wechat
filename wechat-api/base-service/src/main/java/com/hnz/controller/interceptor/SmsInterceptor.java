@@ -2,7 +2,6 @@ package com.hnz.controller.interceptor;
 
 import com.hnz.base.BaseInfoProperties;
 import com.hnz.exceptions.GraceException;
-import com.hnz.exceptions.MyCustomException;
 import com.hnz.result.ResponseStatusEnum;
 import com.hnz.utils.IPUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,8 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
-import static com.hnz.base.BaseInfoProperties.MOBILE_SMSCODE;
 
 /**
  * @Author：hnz

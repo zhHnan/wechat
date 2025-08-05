@@ -1,7 +1,6 @@
 package com.hnz.config;
 
 import com.hnz.controller.interceptor.SmsInterceptor;
-import com.tencentcloudapi.pts.v20210728.models.RegionDetail;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -30,6 +29,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(smsInterceptor()).addPathPatterns("/auth/getSmsCode");
+        registry.addInterceptor(smsInterceptor()).addPathPatterns("/passport/getSmsCode");
     }
 }

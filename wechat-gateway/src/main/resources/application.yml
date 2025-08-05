@@ -12,7 +12,7 @@ logging:
   level:
     root: info
 
-blackIp:
-  continueCounts: 3
-  timeInterval: 20
-  limitTime: 30
+#blackIp:
+#  continueCounts: 5
+#  timeInterval: 15
+#  limitTime: 30
