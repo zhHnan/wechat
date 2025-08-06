@@ -4,6 +4,8 @@ server:
     max-swallow-size: -1 # -1 unlimited
 
 spring:
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   profiles:
     active: dev
   application:

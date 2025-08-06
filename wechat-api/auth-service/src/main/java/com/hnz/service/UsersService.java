@@ -11,6 +11,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author hnz
  * @since 2025-08-05
  */
-public interface UsersService extends IService<Users> {
+public interface UsersService {
 
+    Users queryMobileIfExist(String mobile);
+    Users createUsers(String mobile, String nickname);
 }

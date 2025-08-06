@@ -1,12 +1,11 @@
 package com.hnz.bo;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 
 /**
  * @Auther 风间影月
@@ -21,8 +20,8 @@ public class RegistLoginBO {
     @Length(min = 11, max = 11, message = "手机号长度不正确")
     private String mobile;
 
-    @org.hibernate.validator.constraints.NotBlank(message = "验证码不能为空")
-    // @Length(min = 6, max = 6, message = "验证码长度不正确")
+    @NotBlank(message = "验证码不能为空")
+    @Length(min = 6, max = 6, message = "验证码长度不正确")
     private String smsCode;
 
     private String nickname;
