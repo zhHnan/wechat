@@ -1,5 +1,6 @@
 package com.hnz.controller;
 
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.hnz.base.BaseInfoProperties;
 import com.hnz.bo.RegistLoginBO;
 import com.hnz.entity.Users;
@@ -7,15 +8,17 @@ import com.hnz.result.R;
 import com.hnz.result.ResponseStatusEnum;
 import com.hnz.service.UsersService;
 import com.hnz.utils.IPUtil;
+import com.hnz.utils.JsonUtils;
+import com.hnz.vo.UserVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 /**
  * @Author：hnz
@@ -65,7 +68,12 @@ public class PassportController extends BaseInfoProperties {
             return R.errorCustom(ResponseStatusEnum.USER_ALREADY_EXIST_ERROR);
         }
         redis.del(MOBILE_SMSCODE + ":" + mobile);
-        return R.ok(user);
+        String uToken = TOKEN_USER_PREFIX + SYMBOL_DOT +UUID.randomUUID();
+        redis.set(REDIS_USER_TOKEN + ":" + user.getId(), uToken);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        userVO.setUserToken(uToken);
+        return R.ok(userVO);
     }
 
     @PostMapping("login")
@@ -82,6 +90,19 @@ public class PassportController extends BaseInfoProperties {
             return R.errorCustom(ResponseStatusEnum.USER_NOT_EXIST_ERROR);
         }
         redis.del(MOBILE_SMSCODE + ":" + mobile);
-        return R.ok(user);
+
+        String uToken = TOKEN_USER_PREFIX + SYMBOL_DOT +UUID.randomUUID();
+        redis.set(REDIS_USER_TOKEN + ":" + user.getId(), uToken);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        userVO.setUserToken(uToken);
+        return R.ok(userVO);
+    }
+
+    @PostMapping("logout")
+    public R logout(@RequestParam String userId, HttpServletRequest request) {
+//        清理token
+        redis.del(REDIS_USER_TOKEN + ":" + userId);
+        return R.ok();
     }
 }
