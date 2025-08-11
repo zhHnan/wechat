@@ -1,6 +1,7 @@
 package com.hnz.service;
 
 import com.hnz.bo.ModifyUserBO;
+import com.hnz.entity.Users;
 
 /**
  * <p>
@@ -12,4 +13,5 @@ import com.hnz.bo.ModifyUserBO;
  */
 public interface UsersService {
     void modifyUserInfo(ModifyUserBO modifyUserBO);
+    public Users getUserById(String userId);
 }
