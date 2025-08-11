@@ -13,5 +13,5 @@ import com.hnz.entity.Users;
  */
 public interface UsersService {
     void modifyUserInfo(ModifyUserBO modifyUserBO);
-    public Users getUserById(String userId);
+    Users getUserById(String userId);
 }
