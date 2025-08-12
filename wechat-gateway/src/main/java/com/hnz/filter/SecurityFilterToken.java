@@ -45,6 +45,13 @@ public class SecurityFilterToken extends BaseInfoProperties implements GlobalFil
                 }
             }
         }
+//        排除静态资源服务器static
+        String fileStart = excludeUrlPath.getFileStart();
+        if (StringUtils.isNotEmpty(fileStart)){
+            if(matcher.match(fileStart, url)){
+                return chain.filter(exchange);
+            }
+        }
 //        到达此处说明请求被拦截
 //        判断headers中是否包含token
         HttpHeaders headers = exchange.getRequest().getHeaders();

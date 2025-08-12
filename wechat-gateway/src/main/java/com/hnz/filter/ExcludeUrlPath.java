@@ -21,4 +21,5 @@ import java.util.List;
 @ConfigurationProperties(prefix = "exclude")
 public class ExcludeUrlPath {
     private List<String> urls;
+    private String fileStart;
 }
