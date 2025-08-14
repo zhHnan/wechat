@@ -1,12 +1,19 @@
 package com.hnz.controller;
 
+import com.alibaba.cloud.commons.lang.StringUtils;
+import com.hnz.config.MinIOConfig;
+import com.hnz.config.MinIOUtils;
 import com.hnz.result.R;
+import com.hnz.result.ResponseStatusEnum;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @Author：hnz
@@ -19,22 +26,23 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/file")
 public class FileController {
+    @Resource
+    private MinIOConfig minIOConfig;
+
     @PostMapping("/uploadFace")
-    public R uploadFace(@RequestParam("file") MultipartFile file, @RequestParam("userId")String userId, HttpServletRequest request) throws IOException {
+    public R uploadFace(@RequestParam("file") MultipartFile file, @RequestParam("userId") String userId, HttpServletRequest request) throws Exception {
+        if (StringUtils.isEmpty(userId)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
         String filename = file.getOriginalFilename();
-        String suffixName = null;
-        if (filename != null) {
-            suffixName = filename.substring(filename.lastIndexOf("."));
+        if (StringUtils.isEmpty(filename)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
         }
-        String newFileName = userId + suffixName;
-//        文件的存放路径
-        String rootPath = "/temp" + File.separator;
-        String filePath = rootPath + File.separator + "face" + File.separator + newFileName;
-        File dest = new File(filePath);
-        if (!dest.getParentFile().exists()) {
-            dest.getParentFile().mkdirs();
-        }
-        file.transferTo(dest);
-        return R.ok();
+        filename = "face" + File.separator + userId + File.separator + filename;
+        MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream());
+//        String faceUrl = MinIOUtils.getPresignedObjectUrl(minIOConfig.getBucketName(), filename);
+        String faceUrl = minIOConfig.getFileHost() + "/" + minIOConfig.getBucketName() + "/" + filename;
+//        更新到数据库
+        return R.ok(faceUrl);
     }
 }
