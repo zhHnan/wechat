@@ -8,6 +8,10 @@ spring:
     active: dev
   application:
     name: file-service
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
 logging:
   level:
     root: info
