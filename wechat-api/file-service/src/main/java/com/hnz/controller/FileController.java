@@ -1,10 +1,13 @@
 package com.hnz.controller;
 
 import com.alibaba.cloud.commons.lang.StringUtils;
+import com.hnz.api.feign.UserInfoServiceFeign;
 import com.hnz.config.MinIOConfig;
 import com.hnz.config.MinIOUtils;
 import com.hnz.result.R;
 import com.hnz.result.ResponseStatusEnum;
+import com.hnz.utils.JsonUtils;
+import com.hnz.vo.UserVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,12 +27,14 @@ import java.io.File;
  */
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("file")
 public class FileController {
     @Resource
     private MinIOConfig minIOConfig;
+    @Resource
+    private UserInfoServiceFeign userInfoServiceFeign;
 
-    @PostMapping("/uploadFace")
+    @PostMapping("uploadFace")
     public R uploadFace(@RequestParam("file") MultipartFile file, @RequestParam("userId") String userId, HttpServletRequest request) throws Exception {
         if (StringUtils.isEmpty(userId)) {
             return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
@@ -43,6 +48,9 @@ public class FileController {
 //        String faceUrl = MinIOUtils.getPresignedObjectUrl(minIOConfig.getBucketName(), filename);
         String faceUrl = minIOConfig.getFileHost() + "/" + minIOConfig.getBucketName() + "/" + filename;
 //        更新到数据库
-        return R.ok(faceUrl);
+        R res = userInfoServiceFeign.updateFace(userId, faceUrl);
+        String s = JsonUtils.objectToJson(res.getData());
+        UserVO userVO = JsonUtils.jsonToPojo(s, UserVO.class);
+        return R.ok(userVO);
     }
 }

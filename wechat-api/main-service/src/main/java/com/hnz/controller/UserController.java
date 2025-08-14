@@ -23,17 +23,17 @@ import static com.hnz.base.BaseInfoProperties.*;
  */
 
 @RestController
-@RequestMapping("/userinfo")
+@RequestMapping("userinfo")
 public class UserController {
     @Resource
     private UsersService usersService;
     @Resource
     private RedisOperator redis;
-    @PostMapping("/modify")
+    @PostMapping("modify")
     public R modify(@RequestBody ModifyUserBO UserBO) {
         usersService.modifyUserInfo(UserBO);
         UserVO userVO = getUserInfo(UserBO.getUserId(), true);
-        return R.ok();
+        return R.ok(userVO);
     }
 
     private UserVO getUserInfo(String userId, boolean needToken) {
@@ -50,5 +50,15 @@ public class UserController {
     @PostMapping("get")
     public R get(@RequestParam("userId") String userId) {
         return R.ok(getUserInfo(userId, false));
+    }
+
+    @PostMapping("updateFace")
+    public R updateFace(@RequestParam("userId") String userId, @RequestParam("face") String face) {
+        ModifyUserBO userBO = new ModifyUserBO();
+        userBO.setUserId(userId);
+        userBO.setFace(face);
+        usersService.modifyUserInfo(userBO);
+        UserVO userVO = getUserInfo(userBO.getUserId(), true);
+        return R.ok(userVO);
     }
 }
