@@ -1,6 +1,7 @@
 package com.hnz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hnz.api.feign.FileServiceFeign;
 import com.hnz.base.BaseInfoProperties;
 import com.hnz.entity.Users;
 import com.hnz.enums.Sex;
@@ -27,6 +28,8 @@ import java.util.UUID;
 public class UsersServiceImpl extends BaseInfoProperties implements UsersService {
     @Resource
     private UsersMapper usersMapper;
+    @Resource
+    private FileServiceFeign fileServiceFeign;
     @Override
     public Users queryMobileIfExist(String mobile) {
         return usersMapper.selectOne(new QueryWrapper<Users>().eq("mobile", mobile));
@@ -41,7 +44,8 @@ public class UsersServiceImpl extends BaseInfoProperties implements UsersService
         String[] split = uuid.split("-");
         String wechatNum = "wx"+ split[0] + split[1];
         users.setWechatNum(wechatNum);
-        users.setWechatNumImg("https://i.loli.net/2021/08/05/XwxZwZQZYyjqKxX.png");
+        String wechatNumImg = getQrCodeUrl(wechatNum, TEMP_STRING);
+        users.setWechatNumImg(wechatNumImg);
         users.setSex(Sex.secret.type);
         users.setNickname(Objects.requireNonNullElseGet(nickname, () -> "用户" + wechatNum));
         users.setRealName("");
@@ -57,5 +61,13 @@ public class UsersServiceImpl extends BaseInfoProperties implements UsersService
         users.setUpdatedTime(LocalDateTime.now());
         usersMapper.insert(users);
         return users;
+    }
+
+    private String getQrCodeUrl(String wechatNum, String userId){
+        try {
+            return fileServiceFeign.generatorQrCode(wechatNum, userId);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
