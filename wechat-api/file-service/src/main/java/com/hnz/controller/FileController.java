@@ -7,6 +7,7 @@ import com.hnz.config.MinIOUtils;
 import com.hnz.result.R;
 import com.hnz.result.ResponseStatusEnum;
 import com.hnz.utils.JsonUtils;
+import com.hnz.utils.QrCodeUtils;
 import com.hnz.vo.UserVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Author：hnz
@@ -52,5 +56,20 @@ public class FileController {
         String s = JsonUtils.objectToJson(res.getData());
         UserVO userVO = JsonUtils.jsonToPojo(s, UserVO.class);
         return R.ok(userVO);
+    }
+
+//    二维码生成
+    @PostMapping("generatorQrCode")
+    public String generatorQrCode(String wechatNumber, String userId) throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("wechatNumber", wechatNumber);
+        map.put("userId", userId);
+        String qrCodePath = QrCodeUtils.generateQRCode(JsonUtils.objectToJson(map));
+        if (StringUtils.isNotEmpty(qrCodePath)){
+            String uuid = UUID.randomUUID().toString();
+            String objectName = "wechatNumber" + File.separator + userId + File.separator + uuid + ".png";
+            return MinIOUtils.uploadFile(minIOConfig.getBucketName(), objectName, qrCodePath, true);
+        }
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package com.hnz.service.impl;
 
 import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.hnz.api.feign.FileServiceFeign;
 import com.hnz.base.BaseInfoProperties;
 import com.hnz.bo.ModifyUserBO;
 import com.hnz.entity.Users;
@@ -30,6 +31,8 @@ import static com.hnz.result.ResponseStatusEnum.WECHAT_NUM_ALREADY_MODIFIED_ERRO
 public class UsersServiceImpl extends BaseInfoProperties implements UsersService {
     @Resource
     private UsersMapper usersMapper;
+    @Resource
+    private FileServiceFeign fileServiceFeign;
     @Override
     public void modifyUserInfo(ModifyUserBO modifyUserBO) {
 
@@ -40,6 +43,10 @@ public class UsersServiceImpl extends BaseInfoProperties implements UsersService
         if (StringUtils.isNotEmpty(wechatNum)){
             if (redis.keyIsExist(WECHAT_NUM_ALREADY_MODIFIED_ERROR + ":" + userId)){
                 GraceException.display(WECHAT_NUM_ALREADY_MODIFIED_ERROR);
+            }else {
+//                修改微信二维码
+                String qrCodeUrl = getQrCodeUrl(wechatNum, userId);
+                users.setWechatNumImg(qrCodeUrl);
             }
         }
         if (StringUtils.isBlank(userId)){
@@ -57,5 +64,13 @@ public class UsersServiceImpl extends BaseInfoProperties implements UsersService
     @Override
     public Users getUserById(String userId) {
         return usersMapper.selectById(userId);
+    }
+
+    private String getQrCodeUrl(String wechatNum, String userId){
+        try {
+            return fileServiceFeign.generatorQrCode(wechatNum, userId);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
