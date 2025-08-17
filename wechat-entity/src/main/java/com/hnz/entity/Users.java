@@ -4,14 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * <p>
- * 用户表
- * </p>
- *
- * @author hnz
- * @since 2025-08-05
- */
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
