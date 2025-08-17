@@ -61,4 +61,13 @@ public class UserController {
         UserVO userVO = getUserInfo(userBO.getUserId(), true);
         return R.ok(userVO);
     }
+    @PostMapping("updateFriendCircleBg")
+    public R updateFriendCircleBg(@RequestParam("userId") String userId, @RequestParam("friendCircleBg") String friendCircleBg) {
+        ModifyUserBO userBO = new ModifyUserBO();
+        userBO.setUserId(userId);
+        userBO.setFriendCircleBg(friendCircleBg);
+        usersService.modifyUserInfo(userBO);
+        UserVO userVO = getUserInfo(userBO.getUserId(), true);
+        return R.ok(userVO);
+    }
 }

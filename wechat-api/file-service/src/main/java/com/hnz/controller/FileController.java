@@ -9,6 +9,7 @@ import com.hnz.result.ResponseStatusEnum;
 import com.hnz.utils.JsonUtils;
 import com.hnz.utils.QrCodeUtils;
 import com.hnz.vo.UserVO;
+import io.minio.ObjectWriteResponse;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,11 +50,9 @@ public class FileController {
             return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
         }
         filename = "face" + File.separator + userId + File.separator + filename;
-        MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream());
-//        String faceUrl = MinIOUtils.getPresignedObjectUrl(minIOConfig.getBucketName(), filename);
-        String faceUrl = minIOConfig.getFileHost() + "/" + minIOConfig.getBucketName() + "/" + filename;
+        String imageUrl = MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream(), true);
 //        更新到数据库
-        R res = userInfoServiceFeign.updateFace(userId, faceUrl);
+        R res = userInfoServiceFeign.updateFace(userId, imageUrl);
         String s = JsonUtils.objectToJson(res.getData());
         UserVO userVO = JsonUtils.jsonToPojo(s, UserVO.class);
         return R.ok(userVO);
@@ -71,5 +71,35 @@ public class FileController {
             return MinIOUtils.uploadFile(minIOConfig.getBucketName(), objectName, qrCodePath, true);
         }
         return null;
+    }
+
+    @PostMapping("uploadFriendCircleBg")
+    public R uploadFriendCircleBg(@RequestParam("file") MultipartFile file, @RequestParam("userId") String userId) throws Exception {
+        if (StringUtils.isEmpty(userId)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+        String filename = file.getOriginalFilename();
+        if (StringUtils.isEmpty(filename)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+        filename = "friendCircleBg" + File.separator + userId + File.separator + dealWithoutFilename(filename);
+        String imageUrl = MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream(), true);
+//        更新到数据库
+        R res = userInfoServiceFeign.updateFriendCircleBg(userId, imageUrl);
+        String s = JsonUtils.objectToJson(res.getData());
+        UserVO userVO = JsonUtils.jsonToPojo(s, UserVO.class);
+        return R.ok(userVO);
+    }
+
+    private String dealWithFilename(String filename){
+        String suffixName = filename.substring(filename.lastIndexOf("."));
+        String fName = filename.substring(0, filename.lastIndexOf("."));
+        String uuid = UUID.randomUUID().toString();
+        return fName + "-" + uuid + suffixName;
+    }
+    private String dealWithoutFilename(String filename){
+        String suffixName = filename.substring(filename.lastIndexOf("."));
+        String uuid = UUID.randomUUID().toString();
+        return uuid + suffixName;
     }
 }

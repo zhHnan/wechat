@@ -18,4 +18,6 @@ public interface UserInfoServiceFeign {
     @PostMapping("/userinfo/updateFace")
     R updateFace(@RequestParam("userId") String userId, @RequestParam("face") String face);
 
-}
+    @PostMapping("updateFriendCircleBg")
+    R updateFriendCircleBg(@RequestParam("userId") String userId, @RequestParam("friendCircleBg") String friendCircleBg) throws Exception;
+};
