@@ -70,4 +70,13 @@ public class UserController {
         UserVO userVO = getUserInfo(userBO.getUserId(), true);
         return R.ok(userVO);
     }
+    @PostMapping("updateChatBg")
+    public R updateChatBg(@RequestParam("userId") String userId, @RequestParam("chatBg") String chatBg) {
+        ModifyUserBO userBO = new ModifyUserBO();
+        userBO.setUserId(userId);
+        userBO.setChatBg(chatBg);
+        usersService.modifyUserInfo(userBO);
+        UserVO userVO = getUserInfo(userBO.getUserId(), true);
+        return R.ok(userVO);
+    }
 }

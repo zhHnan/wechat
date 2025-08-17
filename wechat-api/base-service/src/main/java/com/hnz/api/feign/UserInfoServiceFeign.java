@@ -19,5 +19,7 @@ public interface UserInfoServiceFeign {
     R updateFace(@RequestParam("userId") String userId, @RequestParam("face") String face);
 
     @PostMapping("updateFriendCircleBg")
-    R updateFriendCircleBg(@RequestParam("userId") String userId, @RequestParam("friendCircleBg") String friendCircleBg) throws Exception;
+    R updateFriendCircleBg(@RequestParam("userId") String userId, @RequestParam("friendCircleBg") String friendCircleBg);
+    @PostMapping("updateChatBg")
+    R updateChatBg(@RequestParam("userId") String userId, @RequestParam("chatBg") String chatBg);
 };
