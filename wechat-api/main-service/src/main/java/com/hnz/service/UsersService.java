@@ -14,4 +14,5 @@ import com.hnz.entity.Users;
 public interface UsersService {
     void modifyUserInfo(ModifyUserBO modifyUserBO);
     Users getUserById(String userId);
+    Users getByWechatNumberOrMobile(String query);
 }

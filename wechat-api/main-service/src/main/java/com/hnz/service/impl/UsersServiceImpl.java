@@ -1,6 +1,6 @@
 package com.hnz.service.impl;
 
-import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hnz.api.feign.FileServiceFeign;
 import com.hnz.base.BaseInfoProperties;
 import com.hnz.bo.ModifyUserBO;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static com.hnz.result.ResponseStatusEnum.USER_FROZEN;
 import static com.hnz.result.ResponseStatusEnum.WECHAT_NUM_ALREADY_MODIFIED_ERROR;
 
 /**
@@ -64,6 +63,12 @@ public class UsersServiceImpl extends BaseInfoProperties implements UsersService
     @Override
     public Users getUserById(String userId) {
         return usersMapper.selectById(userId);
+    }
+
+    @Override
+    public Users getByWechatNumberOrMobile(String query) {
+        QueryWrapper<Users> queryWrapper = new QueryWrapper<Users>().eq("mobile", query).or(). eq("wechat_num", query);
+        return usersMapper.selectOne(queryWrapper);
     }
 
     private String getQrCodeUrl(String wechatNum, String userId){

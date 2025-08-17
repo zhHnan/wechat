@@ -1,12 +1,15 @@
 package com.hnz.controller;
 
+import com.alibaba.cloud.commons.lang.StringUtils;
 import com.hnz.bo.ModifyUserBO;
 import com.hnz.entity.Users;
 import com.hnz.result.R;
+import com.hnz.result.ResponseStatusEnum;
 import com.hnz.service.UsersService;
 import com.hnz.utils.RedisOperator;
 import com.hnz.vo.UserVO;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,5 +81,21 @@ public class UserController {
         usersService.modifyUserInfo(userBO);
         UserVO userVO = getUserInfo(userBO.getUserId(), true);
         return R.ok(userVO);
+    }
+    @PostMapping("queryFriend")
+    public R queryFriend(@RequestParam("queryString") String queryString, HttpServletRequest request) {
+       if (StringUtils.isEmpty(queryString)) {
+           return R.error();
+       }
+        Users friend = usersService.getByWechatNumberOrMobile(queryString);
+       if (friend == null) {
+           return R.errorCustom(ResponseStatusEnum.FRIEND_NOT_EXIST_ERROR);
+       }
+//       不能添加自己为好友
+        String userId = request.getHeader(HEADER_USER_ID);
+       if (friend.getId().equals(userId)) {
+           return R.errorCustom(ResponseStatusEnum.CAN_NOT_ADD_SELF_FRIEND_ERROR);
+       }
+        return R.ok(friend);
     }
 }
