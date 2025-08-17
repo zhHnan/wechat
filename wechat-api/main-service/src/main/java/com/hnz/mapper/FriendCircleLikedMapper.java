@@ -1,6 +1,7 @@
 package com.hnz.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.hnz.entity.FriendCircleLiked;
 
 /**
  * <p>
