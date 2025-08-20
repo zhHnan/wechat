@@ -1,5 +1,6 @@
 package com.hnz.controller;
 
+import com.alibaba.cloud.commons.lang.StringUtils;
 import com.hnz.entity.Friendship;
 import com.hnz.result.R;
 import com.hnz.service.FriendshipService;
@@ -26,6 +27,7 @@ public class FriendshipController {
 
     @Resource
     private FriendshipService friendshipService;
+
     @PostMapping("getFriendship")
     public R pass(String friendId, HttpServletRequest request) {
 
@@ -34,4 +36,31 @@ public class FriendshipController {
         Friendship friendship = friendshipService.getFriendship(myId, friendId);
         return R.ok(friendship);
     }
+
+    @PostMapping("queryMyFriends")
+    public R queryMyFriends(HttpServletRequest request) {
+        String myId = request.getHeader(HEADER_USER_ID);
+        return R.ok(friendshipService.queryMyFriends(myId, false));
+    }
+
+    @PostMapping("queryMyBlackList")
+    public R queryMyBlackList(HttpServletRequest request) {
+        String myId = request.getHeader(HEADER_USER_ID);
+        return R.ok(friendshipService.queryMyFriends(myId, true));
+    }
+
+    @PostMapping("updateFriendRemark")
+    public R updateFriendRemark(HttpServletRequest request,
+                                String friendId,
+                                String friendRemark) {
+
+        if (StringUtils.isBlank(friendId) || StringUtils.isBlank(friendRemark)) {
+            return R.error();
+        }
+
+        String myId = request.getHeader(HEADER_USER_ID);
+        friendshipService.updateFriendRemark(myId, friendId, friendRemark);
+        return R.ok();
+    }
+
 }
