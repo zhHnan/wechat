@@ -37,4 +37,10 @@ public class FriendRequestController extends BaseInfoProperties {
         PagedGridResult pagedGridResult = friendRequestService.queryNewFriendList(userId, page, pageSize);
         return R.ok(pagedGridResult);
     }
+    @PostMapping("pass")
+    public R pass(String friendRequestId, String friendRemark) {
+        friendRequestService.passNewFriend(friendRequestId, friendRemark);
+        return R.ok();
+    }
+
 }
