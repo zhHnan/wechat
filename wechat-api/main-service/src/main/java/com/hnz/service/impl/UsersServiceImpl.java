@@ -70,6 +70,10 @@ public class UsersServiceImpl extends BaseInfoProperties implements UsersService
         QueryWrapper<Users> queryWrapper = new QueryWrapper<Users>().eq("mobile", query).or(). eq("wechat_num", query);
         return usersMapper.selectOne(queryWrapper);
     }
+    @Override
+    public Users getById(String userId) {
+        return usersMapper.selectById(userId);
+    }
 
     private String getQrCodeUrl(String wechatNum, String userId){
         try {

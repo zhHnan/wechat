@@ -34,7 +34,7 @@ spring:
           # 负载均衡
           uri: lb://main-service
           predicates:
-            - Path=/main/**,/userinfo/**,/friendRequest/**,/friendship/**
+            - Path=/main/**,/userinfo/**,/friendRequest/**,/friendship/**,/friendCircle/**,/comment/**
       globalcors:
         cors-configurations:
           '[/**]':

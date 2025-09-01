@@ -15,4 +15,5 @@ public interface UsersService {
     void modifyUserInfo(ModifyUserBO modifyUserBO);
     Users getUserById(String userId);
     Users getByWechatNumberOrMobile(String query);
+    Users getById(String userId);
 }
