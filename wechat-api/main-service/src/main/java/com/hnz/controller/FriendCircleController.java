@@ -29,8 +29,7 @@ public class FriendCircleController extends BaseInfoProperties {
     private CommentService commentService;
 
     @PostMapping("publish")
-    public R publish(@RequestBody FriendCircleBO friendCircleBO,
-                     HttpServletRequest request) {
+    public R publish(@RequestBody FriendCircleBO friendCircleBO, HttpServletRequest request) {
 
         String userId = request.getHeader(HEADER_USER_ID);
 
@@ -68,8 +67,7 @@ public class FriendCircleController extends BaseInfoProperties {
     }
 
     @PostMapping("like")
-    public R like(String friendCircleId,
-                                HttpServletRequest request) {
+    public R like(String friendCircleId, HttpServletRequest request) {
 
         String userId = request.getHeader(HEADER_USER_ID);
         friendCircleService.like(friendCircleId, userId);
@@ -78,8 +76,7 @@ public class FriendCircleController extends BaseInfoProperties {
     }
 
     @PostMapping("unlike")
-    public R unlike(String friendCircleId,
-                                  HttpServletRequest request) {
+    public R unlike(String friendCircleId, HttpServletRequest request) {
 
         String userId = request.getHeader(HEADER_USER_ID);
         friendCircleService.unlike(friendCircleId, userId);
@@ -88,20 +85,15 @@ public class FriendCircleController extends BaseInfoProperties {
     }
 
     @PostMapping("likedFriends")
-    public R likedFriends(String friendCircleId,
-                                  HttpServletRequest request) {
-        List<FriendCircleLiked> likedList =
-                friendCircleService.queryLikedFriends(friendCircleId);
+    public R likedFriends(String friendCircleId, HttpServletRequest request) {
+        List<FriendCircleLiked> likedList = friendCircleService.queryLikedFriends(friendCircleId);
         return R.ok(likedList);
     }
 
     @PostMapping("delete")
-    public R delete(String friendCircleId,
-                                  HttpServletRequest request) {
-
+    public R delete(String friendCircleId, HttpServletRequest request) {
         String userId = request.getHeader(HEADER_USER_ID);
         friendCircleService.delete(friendCircleId, userId);
-
         return R.ok();
     }
 }
