@@ -30,8 +30,6 @@ public interface CommentService {
      * @param commentId
      * @param friendCircleId
      */
-    void deleteComment(String commentUserId,
-                              String commentId,
-                              String friendCircleId);
+    void deleteComment(String commentUserId, String commentId, String friendCircleId);
 
 }

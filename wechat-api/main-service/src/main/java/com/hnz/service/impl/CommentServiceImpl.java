@@ -72,9 +72,7 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
 
     @Transactional
     @Override
-    public void deleteComment(String commentUserId,
-                              String commentId,
-                              String friendCircleId) {
+    public void deleteComment(String commentUserId, String commentId, String friendCircleId) {
 
         QueryWrapper<Comment> deleteWrapper = new QueryWrapper<>();
         deleteWrapper.eq("id", commentId);
