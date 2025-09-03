@@ -34,6 +34,14 @@ public class UserChannelSession {
         channels.add(channel);
         multiChannels.put(userId, channels);
     }
+    public static void removeUselessChannel(String userId, String channelId) {
+        List<Channel> channels = getMultiChannels(userId);
+        if (channels == null && channels.isEmpty()) {
+            return;
+        }
+        channels.removeIf(channel -> channel.id().asLongText().equals(channelId));
+        multiChannels.put(userId, channels);
+    }
     public static List<Channel> getMultiChannels(String userId) {
         return multiChannels.get(userId);
     }

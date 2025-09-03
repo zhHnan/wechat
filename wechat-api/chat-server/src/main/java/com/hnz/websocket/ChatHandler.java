@@ -59,6 +59,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         Channel channel = ctx.channel();
         String curChannelId = channel.id().asLongText();
         System.out.println("服务端发生异常："+curChannelId);
+        UserChannelSession.removeUselessChannel(UserChannelSession.getUserIdByChannelId(curChannelId), curChannelId);
         ctx.channel().close();
         clients.remove(channel);
 
@@ -78,6 +79,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         Channel channel = ctx.channel();
         String curChannelId = channel.id().asLongText();
         System.out.println("客户端关闭连接，当前通道的长id："+curChannelId);
+        UserChannelSession.removeUselessChannel(UserChannelSession.getUserIdByChannelId(curChannelId), curChannelId);
         clients.remove(channel);
     }
 }

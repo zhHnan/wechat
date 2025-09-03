@@ -45,7 +45,7 @@ public class UserController {
         BeanUtils.copyProperties(user, userVO);
         if (needToken) {
             String uToken = TOKEN_USER_PREFIX + SYMBOL_DOT + UUID.randomUUID();
-            redis.set(REDIS_USER_TOKEN + ":" + userId, uToken);
+            redis.set(REDIS_USER_TOKEN + ":" + uToken, userId);
             userVO.setUserToken(uToken);
         }
         return userVO;

@@ -59,8 +59,13 @@ public class SecurityFilterToken extends BaseInfoProperties implements GlobalFil
         String userToken = headers.getFirst(HEADER_USER_TOKEN);
         log.info("用户id:{},用户token:{}", userId, userToken);
         if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(userToken)) {
-            String redisToken = redis.get(REDIS_USER_TOKEN + ":" + userId);
-            if (redisToken.equals(userToken)) {
+//            String redisToken = redis.get(REDIS_USER_TOKEN + ":" + userId);
+//            if (redisToken.equals(userToken)) {
+//                return chain.filter(exchange);
+//            }
+//            允许多设备登录
+            String userIdRedis = redis.get(REDIS_USER_TOKEN + ":" + userToken);
+            if (StringUtils.isNotEmpty(userIdRedis) && userId.equals(userIdRedis)) {
                 return chain.filter(exchange);
             }
         }

@@ -1,6 +1,5 @@
 package com.hnz.controller;
 
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.hnz.base.BaseInfoProperties;
 import com.hnz.bo.RegistLoginBO;
 import com.hnz.entity.Users;
@@ -8,7 +7,6 @@ import com.hnz.result.R;
 import com.hnz.result.ResponseStatusEnum;
 import com.hnz.service.UsersService;
 import com.hnz.utils.IPUtil;
-import com.hnz.utils.JsonUtils;
 import com.hnz.vo.UserVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,7 +67,8 @@ public class PassportController extends BaseInfoProperties {
         }
         redis.del(MOBILE_SMSCODE + ":" + mobile);
         String uToken = TOKEN_USER_PREFIX + SYMBOL_DOT +UUID.randomUUID();
-        redis.set(REDIS_USER_TOKEN + ":" + user.getId(), uToken);
+//        redis.set(REDIS_USER_TOKEN + ":" + user.getId(), uToken);
+        redis.set(REDIS_USER_TOKEN + ":" + uToken, user.getId());
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         userVO.setUserToken(uToken);
@@ -92,7 +91,8 @@ public class PassportController extends BaseInfoProperties {
         redis.del(MOBILE_SMSCODE + ":" + mobile);
 
         String uToken = TOKEN_USER_PREFIX + SYMBOL_DOT +UUID.randomUUID();
-        redis.set(REDIS_USER_TOKEN + ":" + user.getId(), uToken);
+//        redis.set(REDIS_USER_TOKEN + ":" + user.getId(), uToken);
+        redis.set(REDIS_USER_TOKEN + ":" + uToken, user.getId());
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         userVO.setUserToken(uToken);
