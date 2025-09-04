@@ -2,14 +2,12 @@ package com.hnz.websocket;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.util.concurrent.GlobalEventExecutor;
+import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * @Author：hnz
@@ -31,6 +29,10 @@ public class WebSocketServerInitializer extends ChannelInitializer<SocketChannel
         pipeline.addLast(new ChunkedWriteHandler());
 //        对http请求进行聚合，聚合成FullHttpRequest或FullHttpResponse
         pipeline.addLast(new HttpObjectAggregator(1024 * 64));
+//        对 心跳 支持
+//        readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds
+        pipeline.addLast(new IdleStateHandler(8, 10, 5 * 60));
+        pipeline.addLast(new HeartBeatHandler());
 //        对 websocket 支持
 //        websocket 服务器端处理类，用于处理websocket连接业务
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
