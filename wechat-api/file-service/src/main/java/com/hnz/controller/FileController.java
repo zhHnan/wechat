@@ -6,10 +6,11 @@ import com.hnz.config.MinIOConfig;
 import com.hnz.config.MinIOUtils;
 import com.hnz.result.R;
 import com.hnz.result.ResponseStatusEnum;
+import com.hnz.utils.JcodecVideoUtil;
 import com.hnz.utils.JsonUtils;
 import com.hnz.utils.QrCodeUtils;
 import com.hnz.vo.UserVO;
-import io.minio.ObjectWriteResponse;
+import com.hnz.vo.VideoMsgVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -121,7 +122,35 @@ public class FileController {
         String imageUrl = MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream(), true);
         return R.ok(imageUrl);
     }
+    @PostMapping("uploadChatVideo")
+    public R uploadChatVideo(@RequestParam("file") MultipartFile file, String userId) throws Exception {
+        if (StringUtils.isBlank(userId)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+        String filename = file.getOriginalFilename();   // 获得文件原始名称
+        if (StringUtils.isBlank(filename)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+        filename = "chat" + File.separator + userId + File.separator + "video" + File.separator + dealWithoutFilename(filename);
+        String videoUrl = MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream(), true);
+        // 帧，封面获取 = 视频截帧 截取第一帧
+        String coverName = UUID.randomUUID() + ".jpg";   // 视频封面的名称
+        String coverPath = JcodecVideoUtil.videoFramesPath + File.separator + "videos" + File.separator + coverName;
+        File coverFile = new File(coverPath);
+        if (!coverFile.getParentFile().exists()) {
+            coverFile.getParentFile().mkdirs();
+        }
+        JcodecVideoUtil.fetchFrame(file, coverFile);
 
+        // 上传封面到minio
+        String coverUrl = MinIOUtils.uploadFile(minIOConfig.getBucketName(), coverName, new FileInputStream(coverFile), true);
+
+        VideoMsgVO videoMsgVO = new VideoMsgVO();
+        videoMsgVO.setVideoPath(videoUrl);
+        videoMsgVO.setCover(coverUrl);
+
+        return R.ok(videoMsgVO);
+    }
 
     private String dealWithFilename(String filename){
         String suffixName = filename.substring(filename.lastIndexOf("."));
