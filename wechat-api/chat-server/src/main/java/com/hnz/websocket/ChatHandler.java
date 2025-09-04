@@ -4,6 +4,7 @@ import com.hnz.enums.MsgTypeEnum;
 import com.hnz.netty.ChatMsg;
 import com.hnz.netty.DataContent;
 import com.hnz.utils.JsonUtils;
+import com.hnz.utils.LocalDateUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -13,6 +14,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -45,10 +47,29 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         String curChannelIdShort = channel.id().asShortText();
 //        System.out.println("当前通道的id："+curChannelId + "，短id："+curChannelIdShort);
 //        判断消息类型，根据不同的类型处理不同业务
-        if(Objects.equals(msgType, MsgTypeEnum.CONNECT_INIT.getType())){
+        if(Objects.equals(msgType, MsgTypeEnum.CONNECT_INIT.type)){
 //            当websocket连接初始化时，把channel和用户id关联
             UserChannelSession.putUserChannelIdRelation(curChannelId, senderId);
             UserChannelSession.putMultiChannels(senderId, channel);
+        }else if (Objects.equals(msgType, MsgTypeEnum.WORDS.type)){
+//            发送消息
+            List<Channel> receiverChannels = UserChannelSession.getMultiChannels(receiverId);
+            if (receiverChannels == null || receiverChannels.isEmpty()){
+//                用户离线
+                System.out.println("接收方没有在线");
+                chatMsg.setIsReceiverOnLine(false);
+            }else {
+                chatMsg.setIsReceiverOnLine(true);
+                for (Channel receiverChannel : receiverChannels) {
+                    Channel findChan = clients.find(receiverChannel.id());
+                    if (findChan != null){
+                        dataContent.setChatMsg(chatMsg);
+                        String format = LocalDateUtils.format(chatMsg.getChatTime(), LocalDateUtils.DATETIME_PATTERN_2);
+                        dataContent.setChatTime(format);
+                        findChan.writeAndFlush(new TextWebSocketFrame(JsonUtils.objectToJson(dataContent)));
+                    }
+                }
+            }
         }
         UserChannelSession.outputMulti();
 //        channel.writeAndFlush(new TextWebSocketFrame(content));
