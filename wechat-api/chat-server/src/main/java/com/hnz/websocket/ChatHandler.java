@@ -3,8 +3,10 @@ package com.hnz.websocket;
 import com.hnz.enums.MsgTypeEnum;
 import com.hnz.netty.ChatMsg;
 import com.hnz.netty.DataContent;
+import com.hnz.result.R;
 import com.hnz.utils.JsonUtils;
 import com.hnz.utils.LocalDateUtils;
+import com.hnz.utils.OkHttpUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -39,13 +41,16 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         String msgText = chatMsg.getMsg();
         String receiverId = chatMsg.getReceiverId();
         String senderId = chatMsg.getSenderId();
+//        判断双方是否为黑名单
+        R r = OkHttpUtil.get("http://127.0.0.1:8092/friendship/isBlack?friendId1st=" + receiverId + "&friendId2nd=" + senderId);
+        if (r == null || (Boolean) r.getData()) {
+            return;
+        }
         chatMsg.setChatTime(LocalDateTime.now());
         Integer msgType = chatMsg.getMsgType();
 
         Channel channel = ctx.channel();
         String curChannelId = channel.id().asLongText();
-        String curChannelIdShort = channel.id().asShortText();
-//        System.out.println("当前通道的id："+curChannelId + "，短id："+curChannelIdShort);
 //        判断消息类型，根据不同的类型处理不同业务
         if(Objects.equals(msgType, MsgTypeEnum.CONNECT_INIT.type)){
 //            当websocket连接初始化时，把channel和用户id关联
