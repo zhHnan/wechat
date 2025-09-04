@@ -4,6 +4,7 @@ import com.alibaba.cloud.commons.lang.StringUtils;
 import com.hnz.api.feign.UserInfoServiceFeign;
 import com.hnz.config.MinIOConfig;
 import com.hnz.config.MinIOUtils;
+import com.hnz.exceptions.GraceException;
 import com.hnz.result.R;
 import com.hnz.result.ResponseStatusEnum;
 import com.hnz.utils.JcodecVideoUtil;
@@ -152,6 +153,24 @@ public class FileController {
         return R.ok(videoMsgVO);
     }
 
+    @PostMapping("uploadChatVoice")
+    public R uploadChatVoice(@RequestParam("file") MultipartFile file, String userId) throws Exception {
+        String voiceUrl = uploadForChatFiles(file, userId);
+        return R.ok(voiceUrl);
+    }
+
+    private String uploadForChatFiles(MultipartFile file, String userId) throws Exception {
+        if (StringUtils.isBlank(userId)) {
+            GraceException.display(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+
+        String filename = file.getOriginalFilename();   // 获得文件原始名称
+        if (StringUtils.isBlank(filename)) {
+            GraceException.display(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+        filename = "chat" + File.separator + userId + File.separator + "voice" + File.separator + dealWithoutFilename(filename);
+        return MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream(), true);
+    }
     private String dealWithFilename(String filename){
         String suffixName = filename.substring(filename.lastIndexOf("."));
         String fName = filename.substring(0, filename.lastIndexOf("."));

@@ -51,7 +51,8 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 //            当websocket连接初始化时，把channel和用户id关联
             UserChannelSession.putUserChannelIdRelation(curChannelId, senderId);
             UserChannelSession.putMultiChannels(senderId, channel);
-        }else if (Objects.equals(msgType, MsgTypeEnum.WORDS.type) || Objects.equals(msgType, MsgTypeEnum.IMAGE.type) || Objects.equals(msgType, MsgTypeEnum.VIDEO.type)){
+        }else if (Objects.equals(msgType, MsgTypeEnum.WORDS.type) || Objects.equals(msgType, MsgTypeEnum.IMAGE.type)
+                || Objects.equals(msgType, MsgTypeEnum.VIDEO.type) || Objects.equals(msgType, MsgTypeEnum.VOICE.type)){
 //            发送消息
             List<Channel> receiverChannels = UserChannelSession.getMultiChannels(receiverId);
             if (receiverChannels == null || receiverChannels.isEmpty()){
@@ -60,22 +61,25 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
                 chatMsg.setIsReceiverOnLine(false);
             }else {
                 chatMsg.setIsReceiverOnLine(true);
-                sendMsgToChannel(dataContent, chatMsg, receiverChannels);
+                sendMsgToChannel(dataContent,msgType, chatMsg, receiverChannels);
             }
         }
 //        同步消息给同一账号的其他通道
         List<Channel> myOtherChannels = UserChannelSession.getMyOtherChannels(senderId, curChannelId);
         if (myOtherChannels != null && !myOtherChannels.isEmpty()) {
-            sendMsgToChannel(dataContent, chatMsg, myOtherChannels);
+            sendMsgToChannel(dataContent,msgType, chatMsg, myOtherChannels);
         }
         UserChannelSession.outputMulti();
 //        channel.writeAndFlush(new TextWebSocketFrame(content));
     }
 
-    private void sendMsgToChannel(DataContent dataContent, ChatMsg chatMsg, List<Channel> myOtherChannels) {
+    private void sendMsgToChannel(DataContent dataContent,Integer MsgType, ChatMsg chatMsg, List<Channel> myOtherChannels) {
         for (Channel myOtherChannel : myOtherChannels) {
             Channel findChan = clients.find(myOtherChannel.id());
             if (findChan != null){
+                if (Objects.equals(MsgType, MsgTypeEnum.VOICE.type)){
+                    chatMsg.setIsRead(false);
+                }
                 dataContent.setChatMsg(chatMsg);
                 String format = LocalDateUtils.format(chatMsg.getChatTime(), LocalDateUtils.DATETIME_PATTERN_2);
                 dataContent.setChatTime(format);
