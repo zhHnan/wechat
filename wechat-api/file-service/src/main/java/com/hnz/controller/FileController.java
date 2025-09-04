@@ -107,6 +107,21 @@ public class FileController {
         UserVO userVO = JsonUtils.jsonToPojo(s, UserVO.class);
         return R.ok(userVO);
     }
+    @PostMapping("uploadChatPhoto")
+    public R uploadChatPhoto(@RequestParam("file") MultipartFile file, String userId) throws Exception {
+
+        if (StringUtils.isBlank(userId)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+        String filename = file.getOriginalFilename();   // 获得文件原始名称
+        if (StringUtils.isBlank(filename)) {
+            return R.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
+        }
+        filename = "chat" + File.separator + userId + File.separator + "photo" + File.separator + dealWithoutFilename(filename);
+        String imageUrl = MinIOUtils.uploadFile(minIOConfig.getBucketName(), filename, file.getInputStream(), true);
+        return R.ok(imageUrl);
+    }
+
 
     private String dealWithFilename(String filename){
         String suffixName = filename.substring(filename.lastIndexOf("."));
