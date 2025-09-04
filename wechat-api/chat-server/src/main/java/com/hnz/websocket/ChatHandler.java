@@ -60,19 +60,28 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
                 chatMsg.setIsReceiverOnLine(false);
             }else {
                 chatMsg.setIsReceiverOnLine(true);
-                for (Channel receiverChannel : receiverChannels) {
-                    Channel findChan = clients.find(receiverChannel.id());
-                    if (findChan != null){
-                        dataContent.setChatMsg(chatMsg);
-                        String format = LocalDateUtils.format(chatMsg.getChatTime(), LocalDateUtils.DATETIME_PATTERN_2);
-                        dataContent.setChatTime(format);
-                        findChan.writeAndFlush(new TextWebSocketFrame(JsonUtils.objectToJson(dataContent)));
-                    }
-                }
+                sendMsgToChannel(dataContent, chatMsg, receiverChannels);
             }
+        }
+//        同步消息给同一账号的其他通道
+        List<Channel> myOtherChannels = UserChannelSession.getMyOtherChannels(senderId, curChannelId);
+        if (myOtherChannels != null && !myOtherChannels.isEmpty()) {
+            sendMsgToChannel(dataContent, chatMsg, myOtherChannels);
         }
         UserChannelSession.outputMulti();
 //        channel.writeAndFlush(new TextWebSocketFrame(content));
+    }
+
+    private void sendMsgToChannel(DataContent dataContent, ChatMsg chatMsg, List<Channel> myOtherChannels) {
+        for (Channel myOtherChannel : myOtherChannels) {
+            Channel findChan = clients.find(myOtherChannel.id());
+            if (findChan != null){
+                dataContent.setChatMsg(chatMsg);
+                String format = LocalDateUtils.format(chatMsg.getChatTime(), LocalDateUtils.DATETIME_PATTERN_2);
+                dataContent.setChatTime(format);
+                findChan.writeAndFlush(new TextWebSocketFrame(JsonUtils.objectToJson(dataContent)));
+            }
+        }
     }
 
     @Override

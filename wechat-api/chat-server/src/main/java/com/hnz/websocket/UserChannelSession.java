@@ -45,6 +45,14 @@ public class UserChannelSession {
     public static List<Channel> getMultiChannels(String userId) {
         return multiChannels.get(userId);
     }
+    public static List<Channel> getMyOtherChannels(String userId, String channelId) {
+        List<Channel> multiChannels = getMultiChannels(userId);
+        if (multiChannels == null || multiChannels.isEmpty()) {
+            return null;
+        }
+        return multiChannels.stream().filter(channel -> !channel.id().asLongText().equals(channelId)).toList();
+    }
+
     public static void outputMulti() {
         System.out.println("==========================");
         for (Map.Entry<String, List<Channel>> entry : multiChannels.entrySet()) {
