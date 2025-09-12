@@ -5,7 +5,7 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.83.162.65:4406/wechat-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://10.85.49.237:3306/wechat?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     hikari:
@@ -20,6 +20,6 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 47.83.162.65:8848
+        server-addr: 10.85.49.237:8848
         username: nacos
         password: nacos
