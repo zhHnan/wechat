@@ -10,14 +10,12 @@ import com.hnz.netty.ChatMsg;
 import com.hnz.service.ChatMessageService;
 import com.hnz.utils.PagedGridResult;
 import jakarta.annotation.Resource;
-import org.aspectj.bridge.Message;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -56,5 +54,14 @@ public class ChatMessageServiceImpl extends BaseInfoProperties implements ChatMe
         ).toList();
         pageInfo.setRecords(list);
         return setterPagedGridPlus(pageInfo);
+    }
+
+    @Transactional
+    @Override
+    public void updateMsgSignRead(String msgId) {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setId(msgId);
+        chatMessage.setIsRead(true);
+        chatMessageMapper.updateById(chatMessage);
     }
 }

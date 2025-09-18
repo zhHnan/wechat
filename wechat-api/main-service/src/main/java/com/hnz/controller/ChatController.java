@@ -38,4 +38,9 @@ public class ChatController extends BaseInfoProperties {
        if (pageSize == null)  pageSize = 10;
        return R.ok(chatMessageService.queryMsgList(sendId, receiveId, page, pageSize));
     }
+    @PostMapping("signRead/{msgId}")
+    public R signRead(@PathVariable(value = "msgId") String msgId) {
+        chatMessageService.updateMsgSignRead(msgId);
+        return R.ok();
+    }
 }
