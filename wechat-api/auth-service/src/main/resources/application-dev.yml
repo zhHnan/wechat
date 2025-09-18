@@ -19,7 +19,7 @@ spring:
       connection-test-query: SELECT 1
   data:
     redis:
-      host: 47.83.162.65
+      host: 10.85.49.237
       port: 6379
       database: 0
       password: hnzadmin

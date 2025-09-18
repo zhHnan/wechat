@@ -1,6 +1,9 @@
 package com.hnz.websocket;
 
+import com.a3test.component.idworker.IdWorkerConfigBean;
+import com.a3test.component.idworker.Snowflake;
 import com.hnz.enums.MsgTypeEnum;
+import com.hnz.mq.MessagePublisher;
 import com.hnz.netty.ChatMsg;
 import com.hnz.netty.DataContent;
 import com.hnz.result.R;
@@ -58,6 +61,10 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             UserChannelSession.putMultiChannels(senderId, channel);
         }else if (Objects.equals(msgType, MsgTypeEnum.WORDS.type) || Objects.equals(msgType, MsgTypeEnum.IMAGE.type)
                 || Objects.equals(msgType, MsgTypeEnum.VIDEO.type) || Objects.equals(msgType, MsgTypeEnum.VOICE.type)){
+//            mq异步解耦，保存信息到数据库，由于数据库无法获得信息的主键id，所以使用snowflake算法生成id
+            Snowflake snowflake = new Snowflake(new IdWorkerConfigBean());
+            chatMsg.setMsgId(snowflake.nextId());
+
 //            发送消息
             List<Channel> receiverChannels = UserChannelSession.getMultiChannels(receiverId);
             if (receiverChannels == null || receiverChannels.isEmpty()){
@@ -74,6 +81,8 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         if (myOtherChannels != null && !myOtherChannels.isEmpty()) {
             sendMsgToChannel(dataContent,msgType, chatMsg, myOtherChannels);
         }
+//        把聊天信息作为mq的消息发送给消费者进行消费处理（保存到数据库）
+        MessagePublisher.sendMsgToSave(chatMsg);
         UserChannelSession.outputMulti();
 //        channel.writeAndFlush(new TextWebSocketFrame(content));
     }
