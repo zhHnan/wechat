@@ -1,12 +1,9 @@
 package com.hnz.controller;
 
 import com.hnz.base.BaseInfoProperties;
-import com.hnz.config.RabbitMQConfig;
-import com.hnz.netty.ChatMsg;
 import com.hnz.result.R;
-import com.hnz.utils.JsonUtils;
+import com.hnz.service.ChatMessageService;
 import jakarta.annotation.Resource;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,6 +19,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("chat")
 public class ChatController extends BaseInfoProperties {
+    @Resource
+    private ChatMessageService chatMessageService;
 
     @PostMapping("getMyUnReadCounts")
     public R getMyUnReadCounts(@RequestParam(value = "myId") String myId) {
@@ -32,5 +31,11 @@ public class ChatController extends BaseInfoProperties {
     public R clearMyUnReadCounts(@RequestParam(value = "myId") String myId, @RequestParam(value = "oppositeId") String oppositeId) {
         redis.setHashValue(CHAT_MSG_LIST + ":" + myId, oppositeId, "0");
         return R.ok();
+    }
+    @PostMapping("list/{sendId}/{receiveId}")
+    public R list(@PathVariable(value = "sendId") String sendId, @PathVariable(value = "receiveId") String receiveId, Integer  page, Integer pageSize) {
+       if (page == null) page = 1;
+       if (pageSize == null)  pageSize = 10;
+       return R.ok(chatMessageService.queryMsgList(sendId, receiveId, page, pageSize));
     }
 }
