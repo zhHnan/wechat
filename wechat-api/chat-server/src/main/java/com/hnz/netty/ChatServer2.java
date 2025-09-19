@@ -20,7 +20,7 @@ import java.util.Optional;
  * @Date：2025/9/2 15:45
  * @Filename：ChatServer
  */
-public class ChatServer {
+public class ChatServer2 {
     public static void main(String[] args) {
 //         定义主、从线程组
 //         主线程池：处理连接请求，但是不做业务处理
