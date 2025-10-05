@@ -7,6 +7,8 @@ import org.apache.zookeeper.data.Stat;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author：hnz
@@ -38,5 +40,25 @@ public class ZookeeperRegister {
         String hostAddress = InetAddress.getLocalHost().getHostAddress();
         System.out.println("本机ip:" + hostAddress);
         return hostAddress;
+    }
+    public static void incrementOnlineCounts(NettyServerNode nettyServerNode) throws Exception{
+        dealOnlineCounts(nettyServerNode, 1);
+    }
+    public static void decrementOnlineCounts(NettyServerNode nettyServerNode) throws Exception{
+        dealOnlineCounts(nettyServerNode, -1);
+    }
+//    处理在线人数的增减
+    public static void dealOnlineCounts(NettyServerNode nettyServerNode, Integer counts) throws Exception {
+        CuratorFramework zkClient = CuratorConfig.getClient();
+        String path = "/server-list";
+        List<String> nodes = zkClient.getChildren().forPath(path);
+        for (String node : nodes) {
+            String value = new String(zkClient.getData().forPath(path + "/" + node));
+            NettyServerNode pendingNode = JsonUtils.jsonToPojo(value, NettyServerNode.class);
+            if (pendingNode != null && pendingNode.getIp().equals(nettyServerNode.getIp()) && pendingNode.getPort().equals(nettyServerNode.getPort())) {
+                pendingNode.setOnlineCounts(pendingNode.getOnlineCounts() + counts);
+                zkClient.setData().forPath(path + "/" + node, Objects.requireNonNull(JsonUtils.objectToJson(pendingNode)).getBytes());
+            }
+        }
     }
 }
