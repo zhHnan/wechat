@@ -29,3 +29,12 @@ spring:
     username: hnz
     password: admin123
     virtual-host: wechat
+
+zookeeper:
+  curator:
+    host: 10.85.49.237:2181
+    namespace: hnz-im
+    connectionTimeoutMs: 30000
+    sessionTimeoutMs: 3000
+    sleepMsBetweenRetries: 2000
+    maxRetries: 3
