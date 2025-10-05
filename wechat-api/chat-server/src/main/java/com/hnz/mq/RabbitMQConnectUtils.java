@@ -1,5 +1,8 @@
 package com.hnz.mq;
 
+import com.hnz.netty.DataContent;
+import com.hnz.utils.JsonUtils;
+import com.hnz.websocket.UserChannelSession;
 import com.rabbitmq.client.*;
 
 import java.io.IOException;
@@ -102,6 +105,18 @@ public class RabbitMQConnectUtils {
                 if (exchange.equalsIgnoreCase(exchangeName)) {
                     String message = new String(body, StandardCharsets.UTF_8);
                     System.out.println("消费者收到消息：" + message);
+                    DataContent dataContent = JsonUtils.jsonToPojo(message, DataContent.class);
+
+                    String senderId = dataContent.getChatMsg().getSenderId();
+                    String receiverId = dataContent.getChatMsg().getReceiverId();
+//                    广播至所有netty节点并且发送给用户聊天消息
+                    List<io.netty.channel.Channel> receiverChannels = UserChannelSession.getMultiChannels(receiverId);
+                    UserChannelSession.sendToTarget(receiverChannels, dataContent);
+//                    广播至所有netty节点并且同步给自己的其他设备聊天消息
+                    String curChannelId = dataContent.getExtend();
+
+                    List<io.netty.channel.Channel> senderChannels = UserChannelSession.getMyOtherChannels(senderId, curChannelId);
+                    UserChannelSession.sendToTarget(senderChannels, dataContent);
                 }
             }
         };

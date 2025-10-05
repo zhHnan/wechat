@@ -1,7 +1,11 @@
 package com.hnz.websocket;
 
 
+import com.hnz.utils.JsonUtils;
+import com.hnz.netty.DataContent;
 import io.netty.channel.Channel;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +57,18 @@ public class UserChannelSession {
         return multiChannels.stream().filter(channel -> !channel.id().asLongText().equals(channelId)).toList();
     }
 
+    public static void sendToTarget(List<Channel> receiverChannels, DataContent dataContent) {
+        ChannelGroup clients = ChatHandler.clients;
+        if (receiverChannels == null) {
+            return;
+        }
+        for (Channel c : receiverChannels) {
+            Channel findChannel = clients.find(c.id());
+            if (findChannel != null) {
+                findChannel.writeAndFlush(new TextWebSocketFrame(JsonUtils.objectToJson(dataContent)));
+            }
+        }
+    }
     public static void outputMulti() {
         System.out.println("==========================");
         for (Map.Entry<String, List<Channel>> entry : multiChannels.entrySet()) {

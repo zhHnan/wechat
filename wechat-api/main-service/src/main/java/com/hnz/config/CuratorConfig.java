@@ -11,6 +11,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheBuilder;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +43,8 @@ public class CuratorConfig {
     public static final String PATH = "/server-list";
     @Autowired
     private RedisOperator redis;
+    @Autowired
+    private RabbitAdmin rabbitAdmin;
     @Bean("curatorClient")
     public CuratorFramework curatorClient(){
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(sleepMsBetweenRetries, maxRetries);
@@ -82,6 +85,9 @@ public class CuratorConfig {
                     String oldPort = oldNode.getPort() + "";
                     String portKey = "netty_port";
                     redis.hdel(portKey, oldPort);
+//                    移除残留消息队列
+                    String queueName = "netty_queue_" + oldPort;
+                    rabbitAdmin.deleteQueue(queueName);
                     break;
                 default:
                     log.info("未知事件");

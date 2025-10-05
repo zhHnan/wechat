@@ -2,9 +2,6 @@ package com.hnz.mq;
 
 import com.hnz.netty.ChatMsg;
 import com.hnz.utils.JsonUtils;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 import java.util.Objects;
 
@@ -22,6 +19,11 @@ public class MessagePublisher {
     public static void sendMsgToSave(ChatMsg msg) throws Exception {
         RabbitMQConnectUtils connectUtils = new RabbitMQConnectUtils();
         connectUtils.sendMsg(Objects.requireNonNull(JsonUtils.objectToJson(msg)), EXCHANGE_NAME, ROUTING_KEY_WECHAT_MSG_SEND);
+    }
+    public static void sendMsgToNettyServers(String msg) throws Exception {
+        RabbitMQConnectUtils connectUtils = new RabbitMQConnectUtils();
+        String fanoutExchange = "fanout_exchange_hnz";
+        connectUtils.sendMsg(msg, fanoutExchange, "");
     }
 
 }

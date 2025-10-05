@@ -30,7 +30,7 @@ import java.util.Objects;
  * @Filename：HttpHandler
  */
 //SimpleChannelInboundHandler 泛型参数为接收到的数据类型
-public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
+public class ChatHandler_single extends SimpleChannelInboundHandler<TextWebSocketFrame> {
     public static ChannelGroup clients = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
@@ -73,19 +73,40 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             chatMsg.setMsgId(snowflake.nextId());
 
 //            发送消息
-            if (Objects.equals(msgType, MsgTypeEnum.VOICE.type)) {
-                chatMsg.setIsRead(false);
+            List<Channel> receiverChannels = UserChannelSession.getMultiChannels(receiverId);
+            if (receiverChannels == null || receiverChannels.isEmpty()){
+//                用户离线
+                System.out.println("接收方没有在线");
+                chatMsg.setIsReceiverOnLine(false);
+            }else {
+                chatMsg.setIsReceiverOnLine(true);
+                sendMsgToChannel(dataContent,msgType, chatMsg, receiverChannels);
             }
-            dataContent.setChatMsg(chatMsg);
-            String chatTimeFormat = LocalDateUtils.format(chatMsg.getChatTime(), LocalDateUtils.DATETIME_PATTERN_2);
-            dataContent.setChatTime(chatTimeFormat);
-
-            MessagePublisher.sendMsgToNettyServers(JsonUtils.objectToJson(dataContent));
-
             MessagePublisher.sendMsgToSave(chatMsg);
+        }
+//        同步消息给同一账号的其他通道
+        List<Channel> myOtherChannels = UserChannelSession.getMyOtherChannels(senderId, curChannelId);
+        if (myOtherChannels != null && !myOtherChannels.isEmpty()) {
+            sendMsgToChannel(dataContent,msgType, chatMsg, myOtherChannels);
         }
 //        把聊天信息作为mq的消息发送给消费者进行消费处理（保存到数据库）
         UserChannelSession.outputMulti();
+//        channel.writeAndFlush(new TextWebSocketFrame(content));
+    }
+
+    private void sendMsgToChannel(DataContent dataContent,Integer MsgType, ChatMsg chatMsg, List<Channel> myOtherChannels) {
+        for (Channel myOtherChannel : myOtherChannels) {
+            Channel findChan = clients.find(myOtherChannel.id());
+            if (findChan != null){
+                if (Objects.equals(MsgType, MsgTypeEnum.VOICE.type)){
+                    chatMsg.setIsRead(false);
+                }
+                dataContent.setChatMsg(chatMsg);
+                String format = LocalDateUtils.format(chatMsg.getChatTime(), LocalDateUtils.DATETIME_PATTERN_2);
+                dataContent.setChatTime(format);
+                findChan.writeAndFlush(new TextWebSocketFrame(JsonUtils.objectToJson(dataContent)));
+            }
+        }
     }
 
     @Override
