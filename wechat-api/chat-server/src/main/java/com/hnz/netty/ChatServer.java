@@ -1,6 +1,7 @@
 package com.hnz.netty;
 
 import com.hnz.utils.JedisPoolUtils;
+import com.hnz.utils.ZookeeperRegister;
 import com.hnz.websocket.WebSocketServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -9,6 +10,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import redis.clients.jedis.Jedis;
 
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +23,7 @@ import java.util.Optional;
  * @Filename：ChatServer
  */
 public class ChatServer {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 //         定义主、从线程组
 //         主线程池：处理连接请求，但是不做业务处理
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -29,6 +31,9 @@ public class ChatServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 //        netty服务启动的时候从redis中查找端口，若没有则选择默认的875
         Integer nettyPort = selectPort(nettyDefaultPort);
+//        注册当前 服务到zookeeper中
+        ZookeeperRegister.registerNettyServer("server-list-", ZookeeperRegister.getLocalIp(), nettyPort);
+
         try {
 //         构建服务器端启动对象
             ServerBootstrap server = new ServerBootstrap();

@@ -1,6 +1,8 @@
 package com.hnz.test;
 
+import com.hnz.utils.CuratorConfig;
 import com.hnz.utils.JedisPoolUtils;
+import org.apache.curator.framework.CuratorFramework;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
@@ -28,6 +30,10 @@ public class MyTest {
     public void testGetNettyPort() {
         Integer res = selectPort(nettyDefaultPort);
         System.out.println(res);
+    }  @Test
+    public void testCurator() {
+        CuratorFramework client = CuratorConfig.getClient();
+        System.out.println(client.getState());
     }
 
     public static final Integer nettyDefaultPort = 875;
