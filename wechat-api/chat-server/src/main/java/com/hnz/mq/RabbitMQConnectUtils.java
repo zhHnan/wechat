@@ -2,6 +2,8 @@ package com.hnz.mq;
 
 import com.rabbitmq.client.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +14,10 @@ public class RabbitMQConnectUtils {
 
     // 开发环境 dev
     private final String host = "10.85.49.237";
-    private final int port = 5682;
+    private final int port = 5672;
     private final String username = "hnz";
     private final String password = "admin123";
-    private final String virtualHost = "wechat-dev";
+    private final String virtualHost = "wechat";
 
     // 生产环境 prod
     //private final String host = "";
@@ -83,7 +85,33 @@ public class RabbitMQConnectUtils {
     public void setConnection(Connection connection) throws Exception {
         getAndSetConnection(false, connection);
     }
+    public void listen(String exchangeName, String queueName) throws Exception{
+        Connection connection = getConnection();
+        Channel channel = connection.createChannel();
+//        发布订阅模式
+        channel.exchangeDeclare(exchangeName, BuiltinExchangeType.FANOUT, true, false, null);
+        channel.queueDeclare(queueName, true, false, false, null);
+//        队列绑定到交换机
+        channel.queueBind(queueName, exchangeName, "");
 
+        Consumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope,
+                                       AMQP.BasicProperties properties, byte[] body) {
+                String exchange = envelope.getExchange();
+                if (exchange.equalsIgnoreCase(exchangeName)) {
+                    String message = new String(body, StandardCharsets.UTF_8);
+                    System.out.println("消费者收到消息：" + message);
+                }
+            }
+        };
+        /*
+         queue: 队列名称
+          autoAck: 是否自动确认, true 自动确认, false 手动确认
+          callback: 消费者
+        */
+        channel.basicConsume(queueName, true, consumer);
+    }
     private synchronized Connection getAndSetConnection(boolean isGet, Connection connection) throws Exception {
         getRabbitMqConnection();
 
