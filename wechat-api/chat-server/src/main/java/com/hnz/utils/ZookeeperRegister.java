@@ -38,9 +38,10 @@ public class ZookeeperRegister {
     }
 
     public static String getLocalIp() throws UnknownHostException {
-        String hostAddress = InetAddress.getLocalHost().getHostAddress();
-        System.out.println("本机ip:" + hostAddress);
-        return hostAddress;
+//        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+//        System.out.println("本机ip:" + hostAddress);
+//        return hostAddress;
+        return "10.85.49.237";
     }
     public static void incrementOnlineCounts(NettyServerNode nettyServerNode)throws Exception{
         dealOnlineCounts(nettyServerNode, 1);
