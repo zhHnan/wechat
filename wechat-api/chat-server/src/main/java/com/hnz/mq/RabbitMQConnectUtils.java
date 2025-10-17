@@ -16,8 +16,8 @@ public class RabbitMQConnectUtils {
     private final int maxConnection = 20;
 
     // 开发环境 dev
-    private final String host = "10.85.49.237";
-    private final int port = 5672;
+    private final String host = "127.0.0.1";
+    private final int port = 5682;
     private final String username = "hnz";
     private final String password = "admin123";
     private final String virtualHost = "wechat";

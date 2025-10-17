@@ -4,16 +4,16 @@ server:
 spring:
   data:
     redis:
-      host: 10.85.49.237
-      port: 6379
+      host: 127.0.0.1
+      port: 5379
       database: 0
       password: hnzadmin
   cloud:
     nacos:
       discovery:
-        server-addr: 10.85.49.237:8848
-        username: nacos
-        password: nacos
+        server-addr: 127.0.0.1:18848
+#        username: nacos
+#        password: nacos
     gateway:
       discovery:
         locator:
@@ -42,3 +42,8 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
+
+blackIp:
+  timeInterval: 5
+  continueCounts: 5
+  limitTime: 10

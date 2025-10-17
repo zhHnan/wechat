@@ -41,7 +41,7 @@ public class ZookeeperRegister {
 //        String hostAddress = InetAddress.getLocalHost().getHostAddress();
 //        System.out.println("本机ip:" + hostAddress);
 //        return hostAddress;
-        return "10.85.49.237";
+        return "127.0.0.1";
     }
     public static void incrementOnlineCounts(NettyServerNode nettyServerNode)throws Exception{
         dealOnlineCounts(nettyServerNode, 1);

@@ -15,7 +15,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
  */
 public class CuratorConfig {
 
-    private static final String HOST = "10.85.49.237:2181";
+    private static final String HOST = "127.0.0.1:3191";
     private static final String NAMESPACE = "hnz-im";
     private static final Integer CONNECTION_TIMEOUT_MS = 30 * 1000;
 //    会话超时时间

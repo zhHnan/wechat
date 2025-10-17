@@ -5,7 +5,7 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://10.85.49.237:3306/wechat?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1:4406/wechat?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     hikari:
@@ -20,19 +20,19 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 10.85.49.237:8848
+        server-addr: 127.0.0.1:18848
         username: nacos
         password: nacos
   rabbitmq:
-    host: 10.85.49.237
-    port: 5672
+    host: 127.0.0.1
+    port: 5682
     username: hnz
     password: admin123
     virtual-host: wechat
 
 zookeeper:
   curator:
-    host: 10.85.49.237:2181
+    host: 127.0.0.1:3191
     namespace: hnz-im
     connectionTimeoutMs: 30000
     sessionTimeoutMs: 3000

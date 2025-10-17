@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  mysql8:
+    image: mysql:8.0.43
+    container_name: mysql8
+    ports:
+      - "4406:3306"
+    volumes:
+      - D:\docker\volumes\mysql8\log:/var/log/mysql
+      - D:\docker\volumes\mysql8\data:/var/lib/mysql
+      - D:\docker\volumes\mysql8\conf:/etc/mysql/conf.d
+      - D:\docker\volumes\mysql8\mysql-files:/var/lib/mysql-files
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+    networks:
+      - hnz-network
+  redis7:
+    image: xuanyuan.run/redis:7.2.4
+    container_name: redis7
+    ports:
+      - "5379:6379"
+    volumes:
+      - D:\docker\volumes\redis7\data:/data
+      - D:\docker\volumes\redis7\conf\redis.conf:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    restart: unless-stopped
+    networks:
+      - hnz-network
+  nacos:
+    image: xuanyuan.run/nacos/nacos-server:v2.5.1
+    container_name: nacos
+    environment:
+      - MODE=standalone
+      - NACOS_AUTH_ENABLE=false
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=mysql8
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_DB_NAME=nacos
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD=root
+      - MYSQL_SERVICE_DB_PARAM=characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+
+    volumes:
+      # 挂载 Nacos 配置目录（持久化自定义配置，如 jdbc.properties、application.properties）
+      - D:\docker\volumes\nacos2.5.1\conf:/home/nacos/conf
+      # 挂载日志目录（持久化日志，避免容器重启后日志丢失）
+      - D:\docker\volumes\nacos2.5.1\logs:/home/nacos/logs
+    ports:
+      - "18848:8848"
+      - "19848:9848"
+      - "19849:9849"
+      - "17848:7848"
+    restart: unless-stopped
+    networks:
+      - hnz-network
+  rabbitmq:
+    image: xuanyuan.run/rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "5681:5671"
+      - "5682:5672"
+      - "4379:4369"
+      - "15681:15671"
+      - "15682:15672"
+      - "25682:25672"
+    restart: always
+    networks:
+      - hnz-network
+  zookeeper:
+    image: xuanyuan.run/zookeeper:3.9.2
+    container_name: zookeeper
+    ports:
+      - "3191:2181"
+    volumes:
+      - D:\docker\volumes\zookeeper3.9/data:/data
+      - D:\docker\volumes\zookeeper3.9/conf:/conf
+      - D:\docker\volumes\zookeeper3.9/logs:/datalog
+    restart: always
+    networks:
+      - hnz-network
+  elasticsearch:
+    image: xuanyuan.run/elasticsearch:8.11.0
+    container_name: elk-elasticsearch
+    restart: always
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node  # 单节点模式（生产环境需集群配置）
+      - bootstrap.memory_lock=true  # 锁定内存（避免内存交换影响性能）
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # 分配JVM内存（根据服务器配置调整）
+      - xpack.security.enabled=false  # 关闭安全验证（简化配置，生产环境需开启）
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - D:\docker\volumes\elasticsearch8.11\data:/usr/share/elasticsearch/data  # 数据持久化
+    ports:
+      - "9200:9200"  # ES HTTP端口
+    networks:
+      - hnz-network
+
+  logstash:
+    image: xuanyuan.run/logstash:8.11.0
+    container_name: elk-logstash
+    restart: always
+    depends_on:
+      - elasticsearch
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+    volumes:
+      - D:\docker\volumes\logstash8.11\pipeline:/usr/share/logstash/pipeline  # 挂载管道配置
+      - D:\docker\volumes\logstash8.11\config:/usr/share/logstash/config      # 挂载Logstash配置
+    ports:
+      - "5000:5000"  # TCP输入端口（接收应用日志）
+    networks:
+      - hnz-network
+
+  kibana:
+    image: xuanyuan.run/kibana:8.11.0
+    container_name: elk-kibana
+    restart: always
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200  # 连接ES地址
+    ports:
+      - "5601:5601"  # Kibana Web端口
+    networks:
+      - hnz-network
+
+networks:
+  hnz-network:
+    driver: bridge
